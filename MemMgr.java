@@ -2,13 +2,30 @@
 // any collections that hold multiple objects
 
 public class MemMgr implements MMInterface{
+    private Chunk head;
+    //private Chunk tail;
+    class Chunk{
+        private int id;
+        private int size;
+        private Chunk next;
+        private Chunk previous;
+
+        Chunk(int id, int size, Chunk previous, Chunk next){
+            this.id = id;
+            this.size = size;
+            this.next = next;
+            this.previous = previous;
+        }
+    }
+    
+    
+    
     /**
 	 * This method sets the initial amount of memory available.  Immediately after init is called all of the memory is available and is in a single large chunk.
 	 */
     public void init(int size){
-        // set initial amount of memory available
-
-        // all of the memory should be available in a single large chunk
+        head = new Chunk(-1, size, null, null);
+        //tail = head;
     }
 
     /**
@@ -16,30 +33,79 @@ public class MemMgr implements MMInterface{
 	 */
     public void malloc(int id, int size) throws MyOutOfMemoryException{
         // start at memory location zero
-        // check until find an unused chunk of memory at least as large as the size requested
-            // mark as being in use, associate id with chunk
+        Chunk current = head;
+        while(current != null){
+            if(current.id == -1 && size <= current.size){
+                // split chunk, subtracting free space into new chunk
+                Chunk allocatedChunk = new Chunk(id, size, current.previous, current);
+                if(allocatedChunk.previous == null){
+                    head = allocatedChunk;
+                }
+                else{
+                    current.previous.next = allocatedChunk;
+                }
+                // resize current
+                current.previous = allocatedChunk;
+                current.size -= size;
 
-        // if not enough memory available, throw MyOutOfMemoryException
-        // store id for use by free call?
+                if(current.size == 0){ // shouldn´t be less than 0
+                    // delete, empty chunk
+                    allocatedChunk.next = current.next; // could be null (if null, tail)
+                    //tail = allocatedChunk.next == null ? allocatedChunk : tail;
+                }
+                return;
+            }
+            current = current == null ? current : current.next;
+        }
+        throw new MyOutOfMemoryException();
     }
 
     /**
 	 * Find the chunk of memory associated with this id and make it available for reuse.  These things should happen to make it available for reuse:  disassociate the id from this chunk of memory, mark the chunk of memory as available for use, coalesce this chunk of memory with any adjacent chunks that are available, so that they become one large chunk of available memory.  Completely coalesce all the memory every time a chunk is freed.  If a chunk of memory with the requested id can not be found throw a MyInvalidMemoryException, create a subclass to Exception for this.
 	 */
     public void free(int id) throws MyInvalidMemoryException{
-        // find chunk of memory associated with id
-            // dissociate id from chunk
-            // mark as available for use
-            // coalesce chunk with any adjacent available chunks
-        // if cannot find chunk w/ id, throw MyInvalidMemoryException
+        Chunk current = head;
+        while(current != null){
+            if(current.id == id){
+                current.id = -1;
+                if(current.previous != null && current.previous.id == -1){
+                    merge(current.previous);
+                    current = current.previous;
+                }
+                if(current.next != null && current.next.id == -1){
+                    merge(current);
+                }
+                return;
+            }
+            current = current == null ? current : current.next;
+        }
+        throw new MyInvalidMemoryException();
+    }
+
+    /**
+     * Combines this chunk and the next chunk into this chunk, assuming that they both possess the id of -1 and current.next != null
+     */
+    private void merge(Chunk current){
+        current.size += current.next.size;
+        if(current.next.next != null){
+            current.next.next.previous = current;
+        }
+        current.next = current.next.next;
     }
 
     /**
 	 * Print out all the memory usage both free and allocated in memory order.  Prints to standard out one line for each memory chunk.  Both allocated and free chunks are printed.  Each line contains the status of the chunk (allocated or free).  The format for a free chunk is: free <starting memory location> <ending memory location>  The format for an allocated chunk is: in use <id> <starting memory location> <ending memory location>
 	 */
     public void print(){
-        // go through linked list of chunks
-            // if free, print using free chunk format
-            // if allocated, print using allocated chunk format
+        Chunk current = head;
+        int location = 0;
+        while(current != null){
+            int endingLocation = location + current.size;
+            String out = current.id == -1 ? "free" : "in use " + current.id;
+            out+= " " + location + " " + endingLocation;
+            System.out.println(out);
+            current = current == null ? current : current.next;
+            location = endingLocation;
+        }
     }
 }

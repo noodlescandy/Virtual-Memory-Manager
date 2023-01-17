@@ -1,9 +1,22 @@
 public class MMTest {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws MyOutOfMemoryException, MyInvalidMemoryException{
         // catch error: no file and print proper usage
         
         // read in file from command line
         
+
+        // temp debug stuff
+        MMInterface mem = new MemMgr();
+        mem.init(1000);
+        mem.print();
+        System.out.println();
+        mem.malloc(11, 50);
+        mem.malloc(112, 500);
+
+        mem.print();
+        System.out.println();
+        mem.free(11);
+        mem.print();
     }
 
     public MMTest(String filename) {
