@@ -26,19 +26,15 @@ public class MMTest {
         MMInterface mem = new MemMgr();
         try{
             while((command = b.readLine()) != null){
-                // exec
                 int indx = command.indexOf(" ");
                 String cmd = indx != -1 ? command.substring(0, indx) : command;
                 String arg = indx != -1 ? command.substring(indx).trim() : "";
-                //System.out.println(cmd);
                 switch (cmd) {
                     case "init":
                         // init <size>
                         try {
                             int size = Integer.parseInt(arg);
                             mem.init(size);
-                            //System.out.println(command);// TODO REMOVE
-
                         } catch (Exception e) {
                             System.out.println("Usage: init <size>");
                         }
@@ -51,7 +47,7 @@ public class MMTest {
                             int size = Integer.parseInt(arg.substring(ind+1));
                             mem.malloc(id, size);
                         } catch (Exception e) {
-                            System.out.println("Invalid: usage malloc <id> <size>");
+                            System.out.println("Invalid: usage malloc <id> <size> where size does not exceed total space free");
                         }
                         break;
                     case "free":
@@ -60,7 +56,7 @@ public class MMTest {
                             int id = Integer.parseInt(arg);
                             mem.free(id);
                         } catch (Exception e) {
-                            System.out.println("Invalid. Usage: free <id>");
+                            System.out.println("Invalid. Usage: free <id> where id matches a used id.");
                         }
                         break;
                     case "print":
@@ -75,6 +71,5 @@ public class MMTest {
             System.out.println("An unexpected error has occurred.");
             System.out.println(e);
         }
-        
     }
 }

@@ -100,10 +100,11 @@ public class MemMgr implements MMInterface{
         while(current != null){
             int endingLocation = location + current.size;
             String out = current.id == -1 ? "free" : "in use " + current.id;
-            out+= " " + location + " " + endingLocation;
+            out+= " " + location + " " + (endingLocation - 1);
             System.out.println(out);
             current = current == null ? current : current.next;
             location = endingLocation;
         }
+        System.out.println();
     }
 }
