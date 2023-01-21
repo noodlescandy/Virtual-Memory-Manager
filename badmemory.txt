@@ -1,0 +1,3 @@
+// ask for too much memory
+init 10
+malloc 1 100

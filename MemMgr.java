@@ -18,8 +18,6 @@ public class MemMgr implements MMInterface{
         }
     }
     
-    
-    
     /**
 	 * This method sets the initial amount of memory available.  Immediately after init is called all of the memory is available and is in a single large chunk.
 	 */

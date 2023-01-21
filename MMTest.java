@@ -1,42 +1,80 @@
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+
 public class MMTest {
     public static void main(String[] args) throws MyOutOfMemoryException, MyInvalidMemoryException{
-        // catch error: no file and print proper usage
-        
-        // read in file from command line
-        
-
-        // temp debug stuff
+        String file;
+        try{
+            file = args[0];
+        }
+        catch(Exception e){
+            System.err.println("Usage MMTest.java <file.txt>");
+            return;
+        }
+        BufferedReader b;
+        try{
+            File f = new File(file);
+            FileReader reader = new FileReader(f);
+            b = new BufferedReader(reader);
+        }
+        catch(Exception e){
+            System.err.println("Invalid File: " + file + " could not be found or opened.\nUsage MMTest.java <file.txt>");
+            return;
+        }
+        String command;
         MMInterface mem = new MemMgr();
-        mem.init(1000);
-        mem.print();
-        System.out.println();
-        mem.malloc(11, 50);
-        mem.malloc(112, 500);
+        try{
+            while((command = b.readLine()) != null){
+                // exec
+                int indx = command.indexOf(" ");
+                String cmd = indx != -1 ? command.substring(0, indx) : command;
+                String arg = indx != -1 ? command.substring(indx).trim() : "";
+                //System.out.println(cmd);
+                switch (cmd) {
+                    case "init":
+                        // init <size>
+                        try {
+                            int size = Integer.parseInt(arg);
+                            mem.init(size);
+                            //System.out.println(command);// TODO REMOVE
 
-        mem.print();
-        System.out.println();
-        mem.free(11);
-        mem.print();
-    }
-
-    public MMTest(String filename) {
-        // open file (sep. method?)
-
-        // go through each line and parse it using parseCommand method
-    }
-
-    private void parseCommand(String command){
-        // if line starts with //, skip line as a comment
-
-        // init <size> -- call init method of MMInterface with size
-        // size must be positive integer less than or equal to Integer.MAX_Value
-
-        // malloc <id> <size> -- calls malloc method of MMInterface
-        // assume id is unique for given input file
-        // Id must be a positive integer that will be less than or equal to Integer.MAX_Value 
-        // size must be positive integer less than or equal to Integer.MAX_Value
-
-        // free <id> -- calls free method of MMInterface
-        // Id must be a positive integer that will be less than or equal to Integer.MAX_Value
+                        } catch (Exception e) {
+                            System.out.println("Usage: init <size>");
+                        }
+                        break;
+                    case "malloc":
+                        // malloc <id> <size>
+                        int ind = arg.indexOf(" ");
+                        try {
+                            int id = Integer.parseInt(arg.substring(0, ind));
+                            int size = Integer.parseInt(arg.substring(ind+1));
+                            mem.malloc(id, size);
+                        } catch (Exception e) {
+                            System.out.println("Invalid: usage malloc <id> <size>");
+                        }
+                        break;
+                    case "free":
+                        // free <id>
+                        try {
+                            int id = Integer.parseInt(arg);
+                            mem.free(id);
+                        } catch (Exception e) {
+                            System.out.println("Invalid. Usage: free <id>");
+                        }
+                        break;
+                    case "print":
+                        mem.print();
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+        catch(Exception e){
+            System.out.println("An unexpected error has occurred.");
+            System.out.println(e);
+        }
+        
     }
 }
