@@ -3,7 +3,7 @@ import java.io.File;
 import java.io.FileReader;
 
 public class MMTest {
-    public static void main(String[] args) throws MyOutOfMemoryException, MyInvalidMemoryException{
+    public static void main(String[] args){
         String file;
         try{
             file = args[0];
@@ -36,7 +36,7 @@ public class MMTest {
                             int size = Integer.parseInt(arg);
                             mem.init(size);
                         } catch (Exception e) {
-                            System.out.println("Usage: init <size>");
+                            System.err.println("Usage: init <size>");
                         }
                         break;
                     case "malloc":
@@ -47,7 +47,7 @@ public class MMTest {
                             int size = Integer.parseInt(arg.substring(ind+1));
                             mem.malloc(id, size);
                         } catch (Exception e) {
-                            System.out.println("Invalid: usage malloc <id> <size> where size does not exceed total space free");
+                            System.err.println("Invalid. Usage: malloc <id> <size> where size does not exceed total space free");
                         }
                         break;
                     case "free":
@@ -56,7 +56,7 @@ public class MMTest {
                             int id = Integer.parseInt(arg);
                             mem.free(id);
                         } catch (Exception e) {
-                            System.out.println("Invalid. Usage: free <id> where id matches a used id.");
+                            System.err.println("Invalid. Usage: free <id> where id matches a used id.");
                         }
                         break;
                     case "print":
@@ -68,8 +68,8 @@ public class MMTest {
             }
         }
         catch(Exception e){
-            System.out.println("An unexpected error has occurred.");
-            System.out.println(e);
+            System.err.println("An unexpected error has occurred.");
+            System.err.println(e);
         }
     }
 }
